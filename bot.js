@@ -13,19 +13,12 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
-});
-
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = new twilio(accountSid, authToken);
 
 
-const sts = new AWS.STS();
+const sts = new AWS.STS({ region: process.env.AWS_REGION });
 
 
 const bucketName = process.env.bName;
@@ -107,9 +100,9 @@ const processYouTubeLink = async (from, url, format) => {
 
 
         const presignedUrl = generatePresignedUrl(s3, s3Key);
-        const shortenedUrl = await shortenUrl(presignedUrl);
+        // const shortenedUrl = await shortenUrl(presignedUrl);
 
-        await sendWhatsAppMessage(from, shortenedUrl);
+        await sendWhatsAppMessage(from, presignedUrl);
 
 
         fs.unlinkSync(outputPath);
